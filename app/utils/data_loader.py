@@ -1,49 +1,15 @@
-import csv
-import io
 import os
-from azure.storage.blob import BlobServiceClient
-from app.logic.produto import Produto
-from app.logic.fornecedor import Supermercado
-from dotenv import load_dotenv
 
-load_dotenv()
+def _ler_csv_blob(nome_arquivo):
+    # Em vez de usar o Azure, simplesmente leia um arquivo local
+    caminho_arquivo = os.path.join(os.path.dirname(__file__), nome_arquivo)
 
-CONN_STR = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER")
+    if not os.path.exists(caminho_arquivo):
+        raise FileNotFoundError(f"O arquivo {nome_arquivo} não foi encontrado.")
 
-def _ler_csv_blob(blob_name):
-    blob_service = BlobServiceClient.from_connection_string(CONN_STR)
-    blob_client = blob_service.get_blob_client(container=CONTAINER, blob=blob_name)
-    stream = blob_client.download_blob()
-    content = stream.readall().decode("utf-8")
-    return list(csv.DictReader(io.StringIO(content)))
+    with open(caminho_arquivo, mode='r', encoding='utf-8') as file:
+        # Aqui você pode usar qualquer biblioteca para ler o CSV
+        import csv
+        reader = csv.DictReader(file)
+        return [row for row in reader]
 
-def carregar_produtos():
-    dados = _ler_csv_blob("produtos.csv")
-    produtos = []
-    for row in dados:
-        p = Produto(
-            row["nome"],
-            float(row["preco"]),
-            float(row["peso"]),
-            row["pais_origem"],
-            int(row["distancia"]),
-            row["transporte"],
-            float(row["emissoes"]),
-            float(row["impacto"]),
-        )
-        produtos.append(p)
-    return produtos
-
-def carregar_supermercados():
-    dados = _ler_csv_blob("supermercados.csv")
-    supermercados = {}
-    for row in dados:
-        s = Supermercado(
-            row["nome"],
-            float(row["consumo_energia"]),
-            float(row["eficiencia"]),
-            int(row["distancia"]),
-        )
-        supermercados[row["nome"]] = s
-    return supermercados
