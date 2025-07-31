@@ -13,7 +13,17 @@ def _ler_csv_blob(nome_arquivo):
         return [row for row in reader]
 
 def carregar_produtos():
-    return _ler_csv_blob('produtos.csv')
+    try:
+        return _ler_csv_blob('produtos.csv')
+    except FileNotFoundError:
+        print("produtos.csv não encontrado, carregando lista vazia")
+        return []
+
 
 def carregar_supermercados():
-    return _ler_csv_blob('supermercados.csv')
+    try:
+        return _ler_csv_blob('supermercados.csv')
+    except FileNotFoundError:
+        print("supermercados.csv não encontrado, carregando lista vazia")
+        return []
+
