@@ -8,8 +8,12 @@ def _ler_csv_blob(nome_arquivo):
         raise FileNotFoundError(f"O arquivo {nome_arquivo} não foi encontrado.")
 
     with open(caminho_arquivo, mode='r', encoding='utf-8') as file:
-        # Aqui você pode usar qualquer biblioteca para ler o CSV
         import csv
         reader = csv.DictReader(file)
         return [row for row in reader]
 
+def carregar_produtos():
+    return _ler_csv_blob('produtos.csv')
+
+def carregar_supermercados():
+    return _ler_csv_blob('supermercados.csv')
